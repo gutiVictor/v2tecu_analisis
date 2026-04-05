@@ -1,0 +1,117 @@
+2026-04-05 17:12:41,886 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:13:35,659 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:13:35,662 - INFO - Iniciando procesamiento con SLA: almacén=1, principal=3, otras=5
+2026-04-05 17:13:35,663 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 17:13:36,236 - INFO - Hoja detectada: Base Ventas
+2026-04-05 17:13:36,290 - INFO - Fila de encabezado detectada: 3
+2026-04-05 17:13:36,379 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 17:13:36,400 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 17:13:36,408 - INFO - Filtros aplicados: 166 registros de 166 totales
+2026-04-05 17:13:36,566 - ERROR - Error generando reporte avanzado: "Column(s) ['No orden'] do not exist"
+Traceback (most recent call last):
+  File "G:\WEB\tecu_analisis\app.py", line 1411, in main
+    mega_buf = generate_report_advanced(df_filtrado, ind_filtrado, ind_global, processor)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "G:\WEB\tecu_analisis\app.py", line 1291, in generate_report_advanced
+    cat_analysis = df_filtrado.groupby('Categoria').agg({
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\groupby\generic.py", line 1432, in aggregate
+    result = op.agg()
+             ^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\apply.py", line 190, in agg
+    return self.agg_dict_like()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\apply.py", line 423, in agg_dict_like
+    return self.agg_or_apply_dict_like(op_name="agg")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\apply.py", line 1608, in agg_or_apply_dict_like
+    result_index, result_data = self.compute_dict_like(
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\apply.py", line 462, in compute_dict_like
+    func = self.normalize_dictlike_arg(op_name, selected_obj, func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\pandas\core\apply.py", line 663, in normalize_dictlike_arg
+    raise KeyError(f"Column(s) {list(cols)} do not exist")
+KeyError: "Column(s) ['No orden'] do not exist"
+2026-04-05 17:29:30,671 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:29:36,165 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:29:36,169 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 17:29:36,218 - INFO - Hoja detectada: Base Ventas
+2026-04-05 17:29:36,270 - INFO - Fila de encabezado detectada: 3
+2026-04-05 17:29:36,353 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 17:29:36,370 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 17:34:47,131 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:35:34,535 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:35:56,167 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:35:58,705 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:36:04,642 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:46:54,449 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:47:02,974 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:47:09,609 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:47:11,541 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:48:11,371 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:48:15,265 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:48:19,359 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:48:21,352 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:48:58,152 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:49:01,978 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:51:24,471 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:51:26,533 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:52:05,778 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:54:24,557 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:54:36,944 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:54:38,836 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:54:45,932 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 17:54:47,132 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:02:56,354 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:03:16,242 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:03:19,008 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:03:20,918 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:06:01,086 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:06:06,394 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:08:05,654 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:08:27,903 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:15:50,172 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:15:52,404 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:16:29,682 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:17:52,199 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:17:55,409 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:01,991 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:01,994 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 18:19:02,048 - INFO - Hoja detectada: Base Ventas
+2026-04-05 18:19:02,106 - INFO - Fila de encabezado detectada: 3
+2026-04-05 18:19:02,187 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 18:19:02,204 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 18:19:05,320 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:06,022 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:06,026 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 18:19:06,073 - INFO - Hoja detectada: Base Ventas
+2026-04-05 18:19:06,126 - INFO - Fila de encabezado detectada: 3
+2026-04-05 18:19:06,209 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 18:19:06,227 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 18:19:08,460 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:08,464 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 18:19:08,511 - INFO - Hoja detectada: Base Ventas
+2026-04-05 18:19:08,562 - INFO - Fila de encabezado detectada: 3
+2026-04-05 18:19:08,644 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 18:19:08,662 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 18:19:12,117 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:12,121 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 18:19:12,169 - INFO - Hoja detectada: Base Ventas
+2026-04-05 18:19:12,227 - INFO - Fila de encabezado detectada: 3
+2026-04-05 18:19:12,308 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 18:19:12,326 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 18:19:12,980 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:14,944 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:17,605 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:19:17,609 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 18:19:17,662 - INFO - Hoja detectada: Base Ventas
+2026-04-05 18:19:17,717 - INFO - Fila de encabezado detectada: 3
+2026-04-05 18:19:17,805 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 18:19:17,825 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 18:20:04,287 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:20:05,476 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:20:06,650 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:20:07,934 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:20:10,946 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 18:20:12,108 - INFO - 🚀 Aplicación TECU Dashboard iniciada
