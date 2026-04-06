@@ -17,7 +17,8 @@ from views.components_view import (
     mostrar_alertas, 
     mostrar_recomendaciones, 
     mostrar_tabla_detalle, 
-    generate_report_advanced
+    generate_report_advanced,
+    mostrar_detalle_instalaciones
 )
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -163,6 +164,10 @@ def main():
     
     mostrar_kpis(ind_global, indicadores, etiqueta)
     st.markdown("---")
+
+    mostrar_detalle_instalaciones(processor, df_filtrado)
+    if indicadores.get('instalaciones', 0) > 0:
+        st.markdown("---")
 
     mostrar_graficos(processor, df_filtrado, debug_mode)
     st.markdown("---")
