@@ -191,7 +191,7 @@ class DataProcessor:
                 'total_pedidos': 0, 'pct_cumplimiento': 0.0, 'cumplen_nns': 0,
                 'con_desvio_despacho': 0, 'promedio_desvio_despacho': 0.0,
                 'con_desvio_entrega': 0, 'promedio_desvio_entrega': 0.0,
-                'pendientes': 0, 'instalaciones': 0,
+                'pendientes': 0, 'instalaciones': 0, 'ordenes_unicas': 0,
             }
         
         total_pedidos = len(df)
@@ -232,6 +232,9 @@ class DataProcessor:
             con_desvio_entrega = 0
             promedio_desvio_entrega = 0.0
         
+        # Órdenes únicas: No_Orden sin repetir (una orden puede tener varias líneas)
+        ordenes_unicas = int(df['No_Orden'].nunique()) if 'No_Orden' in df.columns else total_pedidos
+
         return {
             'total_pedidos': total_pedidos,
             'pct_cumplimiento': pct_cumplimiento,
@@ -243,6 +246,7 @@ class DataProcessor:
             'promedio_desvio_entrega': promedio_desvio_entrega,
             'pendientes': pendientes,
             'instalaciones': instalaciones,
+            'ordenes_unicas': ordenes_unicas,
         }
 
     def get_analisis_instalaciones(self, df: pd.DataFrame) -> pd.DataFrame:
