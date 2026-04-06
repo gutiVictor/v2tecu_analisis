@@ -159,3 +159,26 @@ KeyError: "Column(s) ['No orden'] do not exist"
 2026-04-05 19:33:25,817 - INFO - 🚀 Aplicación TECU Dashboard iniciada
 2026-04-05 19:33:27,783 - INFO - 🚀 Aplicación TECU Dashboard iniciada
 2026-04-05 19:35:14,096 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:39:23,109 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:39:26,070 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:39:31,178 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:39:33,091 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:41:23,127 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 19:41:26,618 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:01:40,352 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:03:01,156 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:03:01,160 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-05 20:03:01,215 - INFO - Hoja detectada: Base Ventas
+2026-04-05 20:03:01,269 - INFO - Fila de encabezado detectada: 3
+2026-04-05 20:03:01,355 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-05 20:03:01,374 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-05 20:03:11,182 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:03:13,974 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:03:40,717 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:03:42,341 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:05:01,621 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:05:03,882 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:06:27,507 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:06:29,350 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:07:32,705 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-05 20:07:34,548 - INFO - 🚀 Aplicación TECU Dashboard iniciada

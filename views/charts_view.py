@@ -259,7 +259,6 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                         'Pct_Incumplimiento': True
                     },
                     color_continuous_scale=['#22c55e', '#f59e0b', '#ef4444'],
-                    range_color=[0, 100],
                     center=dict(lat=4.5709, lon=-74.2973), zoom=4.5,
                     mapbox_style="carto-darkmatter",
                     template=PLOTLY_TEMPLATE,
