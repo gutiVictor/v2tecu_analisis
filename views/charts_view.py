@@ -37,21 +37,91 @@ COORDENADAS_CIUDADES = {
     'yumbo': {'lat': 3.5828, 'lon': -76.4939},
 }
 
-def get_coord(ciudad, coord_type):
+def _normalizar_ciudad(ciudad: str) -> str:
+    """Normaliza el nombre de ciudad: minúsculas y sin acentos."""
     import unicodedata
-    if pd.isna(ciudad): return None
-    # Eliminar acentos y caracteres especiales usando librería estándar en vez de unidecode
-    c_str = str(ciudad).lower()
-    c_lower = ''.join(c for c in unicodedata.normalize('NFD', c_str) if unicodedata.category(c) != 'Mn')
-    
-    # Buscar coincidencia exacta primero
+    c = str(ciudad).lower().strip()
+    return ''.join(ch for ch in unicodedata.normalize('NFD', c) if unicodedata.category(ch) != 'Mn')
+
+
+def get_coord(ciudad, coord_type):
+    """Busca coordenadas en el dict estático (rápido, sin internet)."""
+    if pd.isna(ciudad):
+        return None
+    c_lower = _normalizar_ciudad(ciudad)
     if c_lower in COORDENADAS_CIUDADES:
         return COORDENADAS_CIUDADES[c_lower][coord_type]
-    # Buscar parcial
     for main_c, coords in COORDENADAS_CIUDADES.items():
         if main_c in c_lower:
             return coords[coord_type]
     return None
+
+
+def geocodificar_ciudades(ciudades_unicas: list) -> dict:
+    """
+    Geocodifica un listado de ciudades usando:
+    1. Diccionario estático (instantáneo)
+    2. Nominatim / OpenStreetMap para las desconocidas  (requiere internet)
+    Resultados cacheados en st.session_state['geo_cache'] para evitar
+    llamadas repetidas entre reruns de Streamlit.
+    """
+    import time
+    from geopy.geocoders import Nominatim
+    from geopy.exc import GeocoderTimedOut, GeocoderUnavailable
+
+    # Inicializar caché en sesión si no existe
+    if 'geo_cache' not in st.session_state:
+        st.session_state['geo_cache'] = {}
+
+    cache = st.session_state['geo_cache']
+    resultado = {}  # ciudad_normalizada -> {'lat': ..., 'lon': ...}
+
+    pendientes = []  # ciudades que necesitan geocodificación externa
+
+    for ciudad in ciudades_unicas:
+        if pd.isna(ciudad):
+            continue
+        c_norm = _normalizar_ciudad(ciudad)
+        c_orig = str(ciudad).strip()
+
+        # 1) Buscar en dict estático
+        lat = get_coord(ciudad, 'lat')
+        lon = get_coord(ciudad, 'lon')
+        if lat is not None and lon is not None:
+            resultado[c_orig] = {'lat': lat, 'lon': lon}
+            continue
+
+        # 2) Buscar en caché de sesión
+        if c_norm in cache:
+            resultado[c_orig] = cache[c_norm]
+            continue
+
+        pendientes.append((c_orig, c_norm))
+
+    # 3) Geocodificar con Nominatim los que faltan
+    if pendientes:
+        try:
+            geolocator = Nominatim(
+                user_agent="tecu_dashboard_v2",
+                timeout=5
+            )
+            for c_orig, c_norm in pendientes:
+                try:
+                    query = f"{c_orig}, Colombia"
+                    location = geolocator.geocode(query)
+                    if location:
+                        coords = {'lat': location.latitude, 'lon': location.longitude}
+                        resultado[c_orig] = coords
+                        cache[c_norm] = coords  # guardar en caché
+                    else:
+                        cache[c_norm] = None  # marcar como no encontrado
+                    time.sleep(1)  # respetar el rate-limit de Nominatim (1 req/s)
+                except (GeocoderTimedOut, GeocoderUnavailable):
+                    cache[c_norm] = None
+        except Exception:
+            pass  # sin internet o sin geopy instalado: mostramos lo que ya tenemos
+
+    return resultado
 
 def fig_base() -> Dict:
     """Retorna configuración base para gráficos Plotly en modo oscuro."""
@@ -134,42 +204,83 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
 
     with col_map:
         st.markdown("### 🌎 Mapa de Calor de Demoras por Ciudad")
-        # El mapa muestra las ciudades en rojo (muy demoradas) o verde (perfectas).
         if 'Ciudad' in df_filtrado.columns and len(df_filtrado) > 0:
             df_map = df_filtrado.copy()
-            # Mapear latitudes y longitudes
-            df_map['lat'] = df_map['Ciudad'].apply(lambda c: get_coord(c, 'lat'))
-            df_map['lon'] = df_map['Ciudad'].apply(lambda c: get_coord(c, 'lon'))
-            
-            # Agrupar las que sí encontraron coordenadas
+
+            # Obtener ciudades únicas presentes en los datos filtrados
+            ciudades_unicas = df_map['Ciudad'].dropna().unique().tolist()
+
+            # Geocodificar: dict estático + Nominatim para las desconocidas
+            n_sin_cache = sum(
+                1 for c in ciudades_unicas
+                if _normalizar_ciudad(c) not in st.session_state.get('geo_cache', {})
+                and get_coord(c, 'lat') is None
+            )
+            if n_sin_cache > 0:
+                with st.spinner(f"🌐 Geocodificando {n_sin_cache} ciudad(es) nueva(s)... (puede tardar ~{n_sin_cache}s)"):
+                    coords_map = geocodificar_ciudades(ciudades_unicas)
+            else:
+                coords_map = geocodificar_ciudades(ciudades_unicas)
+
+            # Aplicar coordenadas al DataFrame
+            df_map['lat'] = df_map['Ciudad'].apply(
+                lambda c: coords_map.get(str(c).strip(), {}).get('lat') if pd.notna(c) else None
+            )
+            df_map['lon'] = df_map['Ciudad'].apply(
+                lambda c: coords_map.get(str(c).strip(), {}).get('lon') if pd.notna(c) else None
+            )
+
             df_map_valid = df_map.dropna(subset=['lat', 'lon'])
+
+            # Ciudades sin coordenadas (para informar al usuario)
+            sin_coord = set(ciudades_unicas) - set(df_map_valid['Ciudad'].unique())
+
             if len(df_map_valid) > 0:
                 map_agg = df_map_valid.groupby(['Ciudad', 'lat', 'lon']).agg(
                     Pedidos=('Cumple_NNS', 'count'),
                     Incumplidos=('Cumple_NNS', lambda x: (x == 'No cumple').sum()),
                     Desvio_Prom=('Desvio_Entrega', 'mean')
                 ).reset_index()
-                
-                map_agg['Pct_Incumplimiento'] = (map_agg['Incumplidos'] / map_agg['Pedidos'] * 100).round(1)
+
+                map_agg['Pct_Incumplimiento'] = (
+                    map_agg['Incumplidos'] / map_agg['Pedidos'] * 100
+                ).round(1)
+                map_agg['Desvio_Prom'] = map_agg['Desvio_Prom'].round(1)
 
                 fig_geo = px.scatter_mapbox(
                     map_agg, lat='lat', lon='lon',
                     size='Pedidos', color='Pct_Incumplimiento',
                     hover_name='Ciudad',
-                    hover_data={'lat':False, 'lon':False, 'Incumplidos':True, 'Desvio_Prom':True},
-                    color_continuous_scale=['#22c55e', '#f59e0b', '#ef4444'], # Verde a Rojo
-                    center=dict(lat=4.5709, lon=-74.2973), zoom=4.5, # Centro en Colombia
-                    mapbox_style="carto-darkmatter", # Mapa realista oscuro sin token
+                    hover_data={
+                        'lat': False, 'lon': False,
+                        'Pedidos': True,
+                        'Incumplidos': True,
+                        'Desvio_Prom': True,
+                        'Pct_Incumplimiento': True
+                    },
+                    color_continuous_scale=['#22c55e', '#f59e0b', '#ef4444'],
+                    range_color=[0, 100],
+                    center=dict(lat=4.5709, lon=-74.2973), zoom=4.5,
+                    mapbox_style="carto-darkmatter",
                     template=PLOTLY_TEMPLATE,
-                    title="Zonas Rojas de Incumplimiento"
+                    title=f"Mapa de Cumplimiento — {len(map_agg)} ciudad(es)"
                 )
                 geo_layout = fig_base()
-                geo_layout['margin'] = {"r":0,"t":40,"l":0,"b":0}
+                geo_layout['margin'] = {"r": 0, "t": 40, "l": 0, "b": 0}
                 fig_geo.update_layout(**geo_layout)
                 st.plotly_chart(fig_geo, use_container_width=True)
-                st.caption("💡 Zonas rojas o burbujas grandes alertan alta accidentalidad operativa.")
+                st.caption(
+                    f"🟢 Verde = sin incumplimiento · 🟡 Amarillo = parcial · 🔴 Rojo = crítico. "
+                    f"El tamaño del círculo indica el volumen de pedidos."
+                )
+                if sin_coord:
+                    st.warning(
+                        f"⚠️ {len(sin_coord)} ciudad(es) sin coordenadas (no se pudieron geocodificar): "
+                        f"{', '.join(sorted(sin_coord))}"
+                    )
             else:
-                st.info("ℹ️ No hay ciudades válidas en el set de datos para mapear.")
+                st.info("ℹ️ No se encontraron coordenadas para ninguna ciudad del set filtrado.")
+
 
     with col_scatter:
         st.markdown("### ⚔️ Matriz Operacional (Bodega vs Transporte)")
