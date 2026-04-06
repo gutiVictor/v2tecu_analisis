@@ -190,33 +190,43 @@ class DataProcessor:
             return {
                 'total_pedidos': 0, 'pct_cumplimiento': 0.0, 'cumplen_nns': 0,
                 'con_desvio_despacho': 0, 'promedio_desvio_despacho': 0.0,
-                'con_desvio_entrega': 0, 'promedio_desvio_entrega': 0.0, 'pendientes': 0,
+                'con_desvio_entrega': 0, 'promedio_desvio_entrega': 0.0,
+                'pendientes': 0, 'instalaciones': 0,
             }
         
         total_pedidos = len(df)
         
-        if 'Cumple_NNS' in df.columns:
-            cumplen = len(df[df['Cumple_NNS'] == 'Cumple'])
-            no_cumplen = len(df[df['Cumple_NNS'] == 'No cumple'])
-            pendientes = len(df[df['Cumple_NNS'] == 'PTE'])
-            pct_cumplimiento = round((cumplen / len(df) * 100), 1) if len(df) > 0 else 0.0
+        # Separar instalaciones del resto para no contaminar los conteos
+        mask_instalacion = (
+            df['Categoria'].astype(str).str.strip().str.lower() == 'instalación'
+            if 'Categoria' in df.columns else pd.Series([False] * len(df), index=df.index)
+        )
+        instalaciones = int(mask_instalacion.sum())
+        df_sin_inst = df[~mask_instalacion]  # DataFrame sin instalaciones para los KPIs
+        
+        if 'Cumple_NNS' in df_sin_inst.columns:
+            cumplen = len(df_sin_inst[df_sin_inst['Cumple_NNS'] == 'Cumple'])
+            no_cumplen = len(df_sin_inst[df_sin_inst['Cumple_NNS'] == 'No cumple'])
+            pendientes = len(df_sin_inst[df_sin_inst['Cumple_NNS'] == 'PTE'])
+            base = len(df_sin_inst)
+            pct_cumplimiento = round((cumplen / base * 100), 1) if base > 0 else 0.0
         else:
             cumplen = no_cumplen = pendientes = 0
             pct_cumplimiento = 0.0
         
-        if 'Desvio_Despacho' in df.columns:
-            con_desvio_despacho = len(df[df['Desvio_Despacho'] > 0])
+        if 'Desvio_Despacho' in df_sin_inst.columns:
+            con_desvio_despacho = len(df_sin_inst[df_sin_inst['Desvio_Despacho'] > 0])
             promedio_desvio_despacho = round(
-                df.loc[df['Desvio_Despacho'] > 0, 'Desvio_Despacho'].mean(), 1
+                df_sin_inst.loc[df_sin_inst['Desvio_Despacho'] > 0, 'Desvio_Despacho'].mean(), 1
             ) if con_desvio_despacho > 0 else 0.0
         else:
             con_desvio_despacho = 0
             promedio_desvio_despacho = 0.0
         
-        if 'Desvio_Entrega' in df.columns:
-            con_desvio_entrega = len(df[df['Desvio_Entrega'] > 0])
+        if 'Desvio_Entrega' in df_sin_inst.columns:
+            con_desvio_entrega = len(df_sin_inst[df_sin_inst['Desvio_Entrega'] > 0])
             promedio_desvio_entrega = round(
-                df.loc[df['Desvio_Entrega'] > 0, 'Desvio_Entrega'].mean(), 1
+                df_sin_inst.loc[df_sin_inst['Desvio_Entrega'] > 0, 'Desvio_Entrega'].mean(), 1
             ) if con_desvio_entrega > 0 else 0.0
         else:
             con_desvio_entrega = 0
@@ -232,7 +242,31 @@ class DataProcessor:
             'con_desvio_entrega': con_desvio_entrega,
             'promedio_desvio_entrega': promedio_desvio_entrega,
             'pendientes': pendientes,
+            'instalaciones': instalaciones,
         }
+
+    def get_analisis_instalaciones(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Retorna un análisis de instalaciones agrupado por ciudad."""
+        if 'Categoria' not in df.columns or len(df) == 0:
+            return pd.DataFrame()
+        
+        mask = df['Categoria'].astype(str).str.strip().str.lower() == 'instalación'
+        df_inst = df[mask].copy()
+        
+        if len(df_inst) == 0:
+            return pd.DataFrame()
+        
+        if 'Ciudad' in df_inst.columns:
+            analisis = (
+                df_inst.groupby('Ciudad')
+                .agg(Instalaciones=('No_Orden', 'count'))
+                .reset_index()
+                .sort_values('Instalaciones', ascending=False)
+            )
+        else:
+            analisis = pd.DataFrame({'Ciudad': ['Sin ciudad'], 'Instalaciones': [len(df_inst)]})
+        
+        return analisis
     
     def get_analisis_ciudad(self, df: pd.DataFrame) -> pd.DataFrame:
         """Genera análisis de cumplimiento agrupado por ciudad."""

@@ -170,6 +170,70 @@ def mostrar_alertas(alertas: List[Dict]) -> None:
             unsafe_allow_html=True
         )
 
+
+def mostrar_detalle_instalaciones(processor, df_filtrado: pd.DataFrame) -> None:
+    """
+    Muestra un panel expandible con el análisis de servicios de instalación:
+    total global y detalle por ciudad.
+    """
+    if 'Categoria' not in df_filtrado.columns:
+        return
+
+    df_inst_analisis = processor.get_analisis_instalaciones(df_filtrado)
+    total_inst = len(
+        df_filtrado[
+            df_filtrado['Categoria'].astype(str).str.strip().str.lower() == 'instalación'
+        ]
+    )
+
+    if total_inst == 0:
+        return
+
+    with st.expander(f"🔧 Detalle de Instalaciones ({total_inst} servicios)", expanded=True):
+        st.markdown(
+            f"<p style='color:#8b9dc3; font-size:0.9rem;'>"
+            f"Se realizaron <strong style='color:#e8ecf4'>{total_inst}</strong> servicios de instalación "
+            f"en el período seleccionado. Estos <strong>no</strong> se contabilizan como pedidos pendientes (PTE).</p>",
+            unsafe_allow_html=True
+        )
+
+        if len(df_inst_analisis) > 0:
+            col_t, col_chart = st.columns([1, 2])
+            with col_t:
+                st.markdown("**Por Ciudad**")
+                st.dataframe(
+                    df_inst_analisis.rename(columns={'Ciudad': 'Ciudad', 'Instalaciones': '# Servicios'}),
+                    use_container_width=True,
+                    hide_index=True
+                )
+            with col_chart:
+                try:
+                    import plotly.express as px
+                    fig = px.bar(
+                        df_inst_analisis,
+                        x='Instalaciones',
+                        y='Ciudad',
+                        orientation='h',
+                        color='Instalaciones',
+                        color_continuous_scale='Blues',
+                        labels={'Instalaciones': 'Servicios', 'Ciudad': ''},
+                        title='Instalaciones por Ciudad'
+                    )
+                    fig.update_layout(
+                        showlegend=False,
+                        coloraxis_showscale=False,
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        font=dict(color='#8b9dc3'),
+                        margin=dict(l=0, r=0, t=40, b=0),
+                        height=max(200, len(df_inst_analisis) * 35 + 80)
+                    )
+                    fig.update_xaxes(gridcolor='rgba(139,157,195,0.15)')
+                    fig.update_yaxes(gridcolor='rgba(0,0,0,0)')
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception:
+                    pass  # Si plotly falla, la tabla ya es suficiente
+
 def mostrar_recomendaciones(processor, df_filtrado: pd.DataFrame) -> None:
     st.markdown("### 💡 Análisis de Mejora")
     recs = processor.get_recomendaciones(df_filtrado)

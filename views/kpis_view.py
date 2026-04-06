@@ -6,20 +6,22 @@ def _fila_kpis(indicadores: Dict, label_prefix: str = "") -> None:
     """
     Renderiza una fila horizontal con 5 métricas KPI usando st.columns.
     """
-    cols = st.columns(5)  # Crear 5 columnas de igual ancho
+    cols = st.columns(6)  # 6 columnas: 5 KPIs operativos + Instalaciones
     
     # Definir datos de cada KPI: (etiqueta, valor, delta, help_text)
     datos = [
         ("📦 Total Pedidos", indicadores.get('total_pedidos', 0),
-         None, "Pedidos con status Entregado"),
+         None, "Total de registros en la selección"),
         ("✅ % Cumplimiento NNS", f"{indicadores.get('pct_cumplimiento', 0)}%",
-         f"{indicadores.get('cumplen_nns', 0)} cumplen", "Porcentaje dentro del SLA"),
+         f"{indicadores.get('cumplen_nns', 0)} cumplen", "Porcentaje dentro del SLA (excluye instalaciones)"),
         ("⚠️ Desvío Despacho", indicadores.get('con_desvio_despacho', 0),
          f"Prom: {indicadores.get('promedio_desvio_despacho', 0)}d", "Pedidos con retraso en despacho"),
         ("🔴 Desvío Entrega", indicadores.get('con_desvio_entrega', 0),
          f"Prom: {indicadores.get('promedio_desvio_entrega', 0)}d", "Pedidos fuera de SLA"),
         ("⏳ Pendientes (PTE)", indicadores.get('pendientes', 0),
-         None, "Sin fecha de entrega registrada"),
+         None, "Sin fecha de entrega registrada (excluye instalaciones)"),
+        ("🔧 Instalaciones", indicadores.get('instalaciones', 0),
+         None, "Servicios de instalación realizados (no contados como pendientes)"),
     ]
     
     # Renderizar cada KPI en su columna correspondiente
