@@ -35,6 +35,34 @@ COORDENADAS_CIUDADES = {
     'tulua': {'lat': 4.0846, 'lon': -76.1953}, 'tuluá': {'lat': 4.0846, 'lon': -76.1953},
     'envigado': {'lat': 6.1759, 'lon': -75.5917},
     'yumbo': {'lat': 3.5828, 'lon': -76.4939},
+    
+    # --- DEPARTAMENTOS / REGIONES (para cuando el dato indica el departamento) ---
+    'antioquia': {'lat': 6.2442, 'lon': -75.5812},  # Medellín ref
+    'cesar': {'lat': 10.4631, 'lon': -73.2532},     # Valledupar ref
+    'meta': {'lat': 4.1420, 'lon': -73.6266},       # Villavicencio ref
+    'quindio': {'lat': 4.5339, 'lon': -75.6811},    # Armenia ref
+    'cundinamarca': {'lat': 4.7110, 'lon': -74.0721},
+    'valle del cauca': {'lat': 3.4516, 'lon': -76.5320},
+    'valle': {'lat': 3.4516, 'lon': -76.5320},
+    'atlantico': {'lat': 10.9685, 'lon': -74.7813},
+    'bolivar': {'lat': 10.3910, 'lon': -75.4794},
+    'santander': {'lat': 7.1193, 'lon': -73.1227},
+    'risaralda': {'lat': 4.8133, 'lon': -75.6961},
+    'caldas': {'lat': 5.0689, 'lon': -75.5174},
+    'norte de santander': {'lat': 7.8939, 'lon': -72.5078},
+    'tolima': {'lat': 4.4389, 'lon': -75.2322},
+    'magdalena': {'lat': 11.2408, 'lon': -74.1990},
+    'cordoba': {'lat': 8.7480, 'lon': -75.8814},
+    'narino': {'lat': 1.2136, 'lon': -77.2811},
+    'cauca': {'lat': 2.4382, 'lon': -76.6132},
+    'sucre': {'lat': 9.3047, 'lon': -75.3978},
+    'huila': {'lat': 2.9273, 'lon': -75.2819},
+    'boyaca': {'lat': 5.5353, 'lon': -73.3678},      # Tunja ref
+    'la guajira': {'lat': 11.5444, 'lon': -72.9072}, # Riohacha ref
+    'guajira': {'lat': 11.5444, 'lon': -72.9072},
+    'choco': {'lat': 5.6919, 'lon': -76.6583},       # Quibdó ref
+    'casanare': {'lat': 5.3377, 'lon': -72.3959},    # Yopal ref
+    'putumayo': {'lat': 1.1444, 'lon': -76.6481},    # Mocoa ref
 }
 
 def _normalizar_ciudad(ciudad: str) -> str:
