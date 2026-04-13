@@ -169,16 +169,35 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
 
     with col1:
         st.markdown("### 🎯 Cumplimiento NNS")
-        counts = df_filtrado['Cumple_NNS'].value_counts().reset_index()
+
+        # ── Separar INSTALACION usando Categoria, igual que el KPI ────────
+        if 'Categoria' in df_filtrado.columns:
+            mask_inst = df_filtrado['Categoria'].astype(str).str.strip().str.lower() == 'instalación'
+        else:
+            mask_inst = pd.Series([False] * len(df_filtrado), index=df_filtrado.index)
+        df_nns  = df_filtrado[~mask_inst]   # sin instalaciones → para la gráfica
+        df_inst = df_filtrado[mask_inst]    # solo instalaciones → tabla aparte
+
+        counts = df_nns['Cumple_NNS'].value_counts().reset_index()
         counts.columns = ['Categoria', 'Cantidad']
-        
+        # Garantizar que PTE siempre aparezca (aunque sea 0)
+        for cat in ['Cumple', 'No cumple', 'PTE']:
+            if cat not in counts['Categoria'].values:
+                counts = pd.concat(
+                    [counts, pd.DataFrame({'Categoria': [cat], 'Cantidad': [0]})],
+                    ignore_index=True
+                )
+        cat_order = ['Cumple', 'No cumple', 'PTE']
+        counts['_ord'] = counts['Categoria'].map(lambda c: cat_order.index(c) if c in cat_order else 99)
+        counts = counts.sort_values('_ord').drop(columns='_ord').reset_index(drop=True)
+
         fig = px.pie(
             counts, names='Categoria', values='Cantidad',
             hole=0.55,
             color='Categoria',
             color_discrete_map={
-                'Cumple': COLOR_CUMPLE, 
-                'No cumple': COLOR_NO_CUMPLE, 
+                'Cumple': COLOR_CUMPLE,
+                'No cumple': COLOR_NO_CUMPLE,
                 'PTE': COLOR_PTE
             },
             template=PLOTLY_TEMPLATE,
@@ -186,16 +205,30 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         )
         fig.update_layout(margin=dict(l=20, r=20, t=20, b=20), showlegend=True)
         sel_nns = st.plotly_chart(fig, use_container_width=True, on_select="rerun", key="chart_nns_v5")
-        
+
         if sel_nns and 'selection' in sel_nns:
-            mostrar_datos_fuente(df_filtrado, sel_nns['selection'], 
-                                [('Cumple_NNS', 'Categoria')], 
+            mostrar_datos_fuente(df_nns, sel_nns['selection'],
+                                [('Cumple_NNS', 'Categoria')],
                                 titulo_seccion="🎯 Detalle de Pedidos por Cumplimiento")
         else:
             st.caption("💡 Haz clic en una rodaja para ver el detalle")
-        
-        st.markdown("#### 📋 Detalle Resumen")
+
+        # ── Tabla 1: resumen NNS (sin Instalación) ─────────────────────────
+        st.markdown("#### 📋 Detalle Resumen — Cumplimiento NNS")
         st.dataframe(counts, use_container_width=True, hide_index=True)
+
+        # ── Tabla 2: Instalación (NO cuenta como pendiente) ────────────────
+        st.markdown("#### 🔧 Instalación *(no suma a pendientes)*")
+        if len(df_inst) > 0:
+            pte_inst = int((df_inst['Cumple_NNS'] == 'PTE').sum()) if 'Cumple_NNS' in df_inst.columns else 0
+            df_resumen_inst = pd.DataFrame({
+                'Categoría': ['Instalación (total)'],
+                'Cantidad':  [len(df_inst)]
+            })
+            st.dataframe(df_resumen_inst, use_container_width=True, hide_index=True)
+            st.caption("📦 Estos registros se contabilizan por separado y NO se suman a PTE.")
+        else:
+            st.info("ℹ️ No hay registros de Instalación en el filtro actual.")
 
     with col2:
         st.markdown("### 📊 Desvíos en Despacho vs Entrega")
