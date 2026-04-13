@@ -72,7 +72,17 @@ except FileNotFoundError:
 # ──────────────────────────────────────────────────────────────────────────
 # 🚀 FUNCIÓN PRINCIPAL ORQUESTADORA
 # ──────────────────────────────────────────────────────────────────────────
+
+
+
+#importar logo Tecu  desde la carpeta imagenes
+
+
 def main():
+    col1, col2, col3 = st.sidebar.columns([1, 2, 1])
+    with col2:
+        st.image("imagenes/Tecu1.png", use_container_width=True)
+        
     st.sidebar.markdown("### 📂 Cargar Archivo")
     uploaded = st.sidebar.file_uploader(
         "Archivo Excel (.xlsx / .xls)",
@@ -81,7 +91,7 @@ def main():
     )
 
     if uploaded is None:
-        st.markdown("# 📦 TECU – Análisis de Despachos")
+        st.markdown("# 📦 tecu – Análisis de Despachos")
         st.markdown("---")
 
         col_i1, col_i2, col_i3 = st.columns(3)
@@ -139,7 +149,7 @@ def main():
         logger.error(f"Error generando reporte: {e}")
         st.sidebar.error(f"⚠️ Error generando reporte: {e}")
 
-    st.markdown("# 📊 Dashboard de Despachos TECU Aura `MVC` 🚀")
+    st.markdown("# 📊 Dashboard de Despachos tecu  `MVC` 🚀")
     
     if len(df_filtrado) < len(df_procesado):
         st.info(f"💡 Filtro Activo: Viendo {len(df_filtrado)} de {len(df_procesado)} registros.")
