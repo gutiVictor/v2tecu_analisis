@@ -193,6 +193,9 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                                 titulo_seccion="🎯 Detalle de Pedidos por Cumplimiento")
         else:
             st.caption("💡 Haz clic en una rodaja para ver el detalle")
+        
+        st.markdown("#### 📋 Detalle Resumen")
+        st.dataframe(counts, use_container_width=True, hide_index=True)
 
     with col2:
         st.markdown("### 📊 Desvíos en Despacho vs Entrega")
@@ -216,6 +219,10 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         fig2.update_layout(**fig_base(), yaxis_title='Pedidos', showlegend=False)
         st.plotly_chart(fig2, use_container_width=True)
         
+        st.markdown("#### 📋 Detalle Resumen")
+        df_resumen_desvios = pd.DataFrame({'Categoría': categorias, 'Cantidad': valores})
+        st.dataframe(df_resumen_desvios, use_container_width=True, hide_index=True)
+
         # Texto explicativo dinámico para presentaciones
         st.info(
             f"🗣️ **Líneas para exponer:** De los **{total_e:,}** pedidos totales en pantalla:\n"
@@ -300,6 +307,9 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                     f"🟢 Verde = sin incumplimiento · 🟡 Amarillo = parcial · 🔴 Rojo = crítico. "
                     f"El tamaño del círculo indica el volumen de pedidos."
                 )
+                st.markdown("#### 📋 Detalle Resumen")
+                df_resumen_geo = map_agg[['Ciudad', 'Pedidos', 'Incumplidos', 'Pct_Incumplimiento', 'Desvio_Prom']].sort_values('Pedidos', ascending=False)
+                st.dataframe(df_resumen_geo.head(15), use_container_width=True, hide_index=True)
                 if sin_coord:
                     st.warning(
                         f"⚠️ {len(sin_coord)} ciudad(es) sin coordenadas (no se pudieron geocodificar): "
@@ -331,6 +341,14 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                 fig_scatter.update_layout(**fig_base())
                 st.plotly_chart(fig_scatter, use_container_width=True)
                 st.caption("💡 Todo a la DERECHA = Culpa de Almacén. Todo ARRIBA = Culpa de Transporte.")
+                st.markdown("#### 📋 Detalle Resumen")
+                if 'Transportadora' in df_scat.columns:
+                    resumen_matriz = df_scat.groupby('Transportadora').agg(
+                        Pedidos_Retrasados=('No_Orden', 'count'),
+                        Retraso_Bodega_Prom=('Desvio_Despacho', 'mean'),
+                        Retraso_Ruta_Prom=('Desvio_Entrega', 'mean')
+                    ).reset_index().round(1)
+                    st.dataframe(resumen_matriz, use_container_width=True, hide_index=True)
             else:
                 st.success("🎉 Ningún pedido con desvío, la matriz operacional está limpia.")
 
@@ -365,6 +383,8 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                 fig_heat.update_layout(**fig_base())
                 st.plotly_chart(fig_heat, use_container_width=True)
                 st.caption("💡 El color rojo oscuro indica qué día de la semana concentra la mayor pérdida operativa.")
+                st.markdown("#### 📋 Detalle Resumen")
+                st.dataframe(heatmap_data[['Dia_Semana', 'Total_Incumplidos', 'Valor_en_Riesgo']], use_container_width=True, hide_index=True)
             else:
                 st.success("🎉 No hay incumplimientos para el mapa de calor.")
 
@@ -389,6 +409,8 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             fig_week.update_layout(**fig_base(), yaxis_range=[0, 115])
             st.plotly_chart(fig_week, use_container_width=True)
             st.caption("💡 Las métricas semanales te permiten advertir la caída antes de cerrar mes.")
+            st.markdown("#### 📋 Detalle Resumen")
+            st.dataframe(analisis_s[['Semana', 'Total', 'Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
 
 
 
@@ -413,6 +435,8 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         fig3.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE)
         fig3.update_layout(**fig_base(), yaxis_title='% Cumplimiento', yaxis_range=[0, 115])
         st.plotly_chart(fig3, use_container_width=True)
+        st.markdown("#### 📋 Detalle Resumen")
+        st.dataframe(top_c[['Ciudad', 'Total', 'Cumplen', 'No_Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
 
     col5, col6 = st.columns(2)
     with col5:
@@ -429,6 +453,8 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             fig4.update_layout(**fig_base(), yaxis_title='% Cumplimiento', yaxis_range=[0, 115])
             fig4.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE)
             st.plotly_chart(fig4, use_container_width=True)
+            st.markdown("#### 📋 Detalle Resumen")
+            st.dataframe(top_t[['Transportadora', 'Total', 'Cumplen', 'Pct_Cumplimiento', 'Desvio_Prom']], use_container_width=True, hide_index=True)
 
     with col6:
         st.markdown("### 🏢 Responsables vs Causales")
@@ -459,3 +485,5 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             fig_pareto.add_trace(go.Scatter(x=causas['Causal'], y=causas['Porcentaje Acum'], name='% Acumulado', line=dict(color=COLOR_PRIMARY, width=3), mode='lines+markers+text', text=[f"{v}%" for v in causas['Porcentaje Acum']], yaxis='y2'))
             fig_pareto.update_layout(**fig_base(), yaxis=dict(title='Frecuencia', side='left'), yaxis2=dict(title='% Acumulado', overlaying='y', side='right', range=[0, 110]))
             st.plotly_chart(fig_pareto, use_container_width=True)
+            st.markdown("#### 📋 Detalle Resumen")
+            st.dataframe(causas[['Causal', 'Frecuencia', 'Porcentaje', 'Porcentaje Acum']], use_container_width=True, hide_index=True)
