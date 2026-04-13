@@ -172,13 +172,18 @@ class DataProcessor:
         # ── NORMALIZAR ÁREA DE INCUMPLIMIENTO ──────────────────────────────────────────────
         if 'Area_Incumple' in df.columns:
             df['Area_Incumple'] = df['Area_Incumple'].astype(str).str.strip()
-            df.loc[df['Cumple_NNS'] == 'Cumple', 'Area_Incumple'] = ''
+            df['Area_Incumple'] = df['Area_Incumple'].replace(['nan', '', 'None'], 'Cumplieron')
+            df.loc[df['Cumple_NNS'] == 'Cumple', 'Area_Incumple'] = 'Cumplieron'
         else:
-            df['Area_Incumple'] = ''
+            df['Area_Incumple'] = 'Cumplieron'
         
         # ── NORMALIZAR CAUSAL DE INCUMPLIMIENTO ──────────────────────────────────────────────
-        if 'Causal_Incumplimiento' not in df.columns:
-            df['Causal_Incumplimiento'] = ''
+        if 'Causal_Incumplimiento' in df.columns:
+            df['Causal_Incumplimiento'] = df['Causal_Incumplimiento'].astype(str).str.strip()
+            df['Causal_Incumplimiento'] = df['Causal_Incumplimiento'].replace(['nan', '', 'None'], 'Sin Causal')
+            df.loc[df['Area_Incumple'] == 'Cumplieron', 'Causal_Incumplimiento'] = 'Cumplió'
+        else:
+            df['Causal_Incumplimiento'] = 'Sin Causal'
         
         # ── GUARDAR DATAFRAME PROCESADO ──────────────────────────────────────────────
         self.df_procesado = df

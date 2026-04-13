@@ -431,20 +431,26 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             st.plotly_chart(fig4, use_container_width=True)
 
     with col6:
-        st.markdown("### 🏢 Responsabilidad del Incumplimiento")
-        inc = processor.get_pedidos_incumplimiento(df_filtrado)
-        if inc is not None and len(inc) > 0 and 'Area_Incumple' in inc.columns:
-            areas = inc['Area_Incumple'].value_counts().reset_index()
-            areas.columns = ['Area', 'Cantidad']
-            fig5 = px.pie(areas, names='Area', values='Cantidad', hole=0.45, template=PLOTLY_TEMPLATE)
-            fig5.update_layout(**fig_base())
+        st.markdown("### 🏢 Responsables vs Causales")
+        if 'Area_Incumple' in df_filtrado.columns and 'Causal_Incumplimiento' in df_filtrado.columns:
+            fig5 = px.histogram(
+                df_filtrado, x='Area_Incumple', color='Causal_Incumplimiento',
+                barmode='stack', text_auto=True, template=PLOTLY_TEMPLATE,
+                labels={'Area_Incumple': 'Responsable', 'Causal_Incumplimiento': 'Causal'}
+            )
+            fig5.update_layout(**fig_base(), xaxis_title='Responsable', yaxis_title='Cantidad', showlegend=True, legend=dict(orientation="h", y=-0.2))
             st.plotly_chart(fig5, use_container_width=True)
+            
+            st.markdown("#### 📋 Detalle Resumen")
+            resumen = df_filtrado.groupby(['Area_Incumple', 'Causal_Incumplimiento']).size().reset_index(name='Cantidad')
+            resumen = resumen.sort_values(by=['Area_Incumple', 'Cantidad'], ascending=[True, False])
+            st.dataframe(resumen, use_container_width=True, hide_index=True)
 
     st.markdown("### 🎯 Análisis de Causas Raíz (Principio de Pareto)")
-    if 'Causal de Incumplimiento' in df_filtrado.columns:
+    if 'Causal_Incumplimiento' in df_filtrado.columns:
         df_inc = df_filtrado[df_filtrado['Cumple_NNS'] == 'No cumple'].copy()
         if len(df_inc) > 0:
-            causas = df_inc['Causal de Incumplimiento'].value_counts().reset_index()
+            causas = df_inc['Causal_Incumplimiento'].value_counts().reset_index()
             causas.columns = ['Causal', 'Frecuencia']
             causas['Porcentaje'] = (causas['Frecuencia'] / causas['Frecuencia'].sum() * 100).round(1)
             causas['Porcentaje Acum'] = causas['Porcentaje'].cumsum()
