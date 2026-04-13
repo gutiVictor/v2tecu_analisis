@@ -91,9 +91,17 @@ def main():
     )
 
     if uploaded is None:
-        st.markdown("# 📦 tecu – Análisis de Despachos")
-        st.markdown("---")
-
+    # Crear columnas para centrar
+        left_col, center_col, right_col = st.columns([1, 3, 1])
+    
+        with center_col:
+            col_logo, col_texto = st.columns([0.59, 3])
+        
+        with col_logo:
+            st.image("imagenes/Tecu2.png", width=120)
+        
+        with col_texto:
+            st.title("– Análisis de Despachos")
         col_i1, col_i2, col_i3 = st.columns(3)
         with col_i1:
             st.info("**📅 SLA por ciudad**\n\n"
