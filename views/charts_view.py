@@ -229,46 +229,30 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             st.caption("📦 Estos registros se contabilizan por separado y NO se suman a PTE.")
         else:
             st.info("ℹ️ No hay registros de Instalación en el filtro actual.")
+         
 
     with col2:
-        st.markdown("### 📊 Desvíos en Despacho vs Entrega")
-        ind = processor.get_indicadores(df_filtrado)
-        total_e = ind['total_pedidos'] if ind else 0
-        
-        v_desp = ind.get('con_desvio_despacho', 0)
-        v_ent = ind.get('con_desvio_entrega', 0)
-        # Aproximación de perfectos (Nota: matemáticamente un pedido puede tener ambos desvíos)
-        v_sin = max(0, total_e - max(v_desp, v_ent))
-        
-        categorias = ['Sin Desvío', 'Desvío Despacho', 'Desvío Entrega']
-        valores = [v_sin, v_desp, v_ent]
-        colores = [COLOR_CUMPLE, COLOR_PTE, COLOR_NO_CUMPLE]
-        
-        fig2 = go.Figure(go.Bar(
-            x=categorias, y=valores,
-            marker_color=colores,
-            text=valores, textposition='outside',
-        ))
-        fig2.update_layout(**fig_base(), yaxis_title='Pedidos', showlegend=False)
-        st.plotly_chart(fig2, use_container_width=True)
-        
-        st.markdown("#### 📋 Detalle Resumen")
-        df_resumen_desvios = pd.DataFrame({'Categoría': categorias, 'Cantidad': valores})
-        st.dataframe(df_resumen_desvios, use_container_width=True, hide_index=True)
+        st.markdown("### 🏢 Responsables vs Causales")
+        if 'Area_Incumple' in df_filtrado.columns and 'Causal_Incumplimiento' in df_filtrado.columns:
+            fig5 = px.histogram(
+                df_filtrado, x='Area_Incumple', color='Causal_Incumplimiento',
+                barmode='stack', text_auto=True, template=PLOTLY_TEMPLATE,
+                labels={'Area_Incumple': 'Responsable', 'Causal_Incumplimiento': 'Causal'}
+            )
+            fig5.update_layout(**fig_base(), xaxis_title='Responsable', yaxis_title='Cantidad', showlegend=True, legend=dict(orientation="h", y=-0.2))
+            st.plotly_chart(fig5, use_container_width=True)
+            
+            st.markdown("#### 📋 Detalle Resumen")
+            resumen = df_filtrado.groupby(['Area_Incumple', 'Causal_Incumplimiento']).size().reset_index(name='Cantidad')
+            resumen = resumen.sort_values(by=['Area_Incumple', 'Cantidad'], ascending=[True, False])
+            st.dataframe(resumen, use_container_width=True, hide_index=True)
 
-        # Texto explicativo dinámico para presentaciones
-        st.info(
-            f"🗣️ **Líneas para exponer:** De los **{total_e:,}** pedidos totales en pantalla:\n"
-            f"- **{v_sin:,}** cajas fueron perfectas.\n"
-            f"- **{v_desp:,}** cajas se estancaron dentro de Bodega.\n"
-            f"- **{v_ent:,}** cajas se las demoró la Transportadora."
-        )
-
+    
 
     # ── NUEVA SECCIÓN BI: MATRIZ DE CUADRANTES DE TIEMPO Y MAPA GEOGRÁFICO ──
     st.markdown("---")
     st.markdown("## 🗺️ Análisis Geográfico y Tiempos de Operación (NUEVO BI)")
-    col_map, col_scatter = st.columns(2)
+    col_map = st.container()
 
     with col_map:
         st.markdown("### 🌎 Mapa de Calor de Demoras por Ciudad")
@@ -352,74 +336,13 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                 st.info("ℹ️ No se encontraron coordenadas para ninguna ciudad del set filtrado.")
 
 
-    with col_scatter:
-        st.markdown("### ⚔️ Matriz Operacional (Bodega vs Transporte)")
-        # Un scatter plot cruzando Desvío de Almacén vs Desvío de Transporte, agrupado por pedido
-        if 'Desvio_Despacho' in df_filtrado.columns and 'Desvio_Entrega' in df_filtrado.columns:
-            # Quitamos los que no tienen desvío para ver a los ofensores más claramente
-            df_scat = df_filtrado[(df_filtrado['Desvio_Despacho'] > 0) | (df_filtrado['Desvio_Entrega'] > 0)].copy()
-            
-            if len(df_scat) > 0:
-                fig_scatter = px.scatter(
-                    df_scat,
-                    x='Desvio_Despacho', y='Desvio_Entrega',
-                    color='Transportadora' if 'Transportadora' in df_scat.columns else None,
-                    hover_data=['No_Orden', 'Ciudad', 'Cliente'] if 'Cliente' in df_scat.columns else [],
-                    template=PLOTLY_TEMPLATE,
-                    title="Aislamiento del Origen de la Culpa",
-                    labels={'Desvio_Despacho': 'Días de Retraso BODEGA (X)', 'Desvio_Entrega': 'Días de Retraso RUTA (Y)'}
-                )
-                fig_scatter.add_hline(y=0, line_dash='dash', line_color='#FF0C00', annotation_text='Retraso de Transporte')
-                fig_scatter.add_vline(x=0, line_dash='dash', line_color='#FF3B00', annotation_text='Retraso de Bodega')
-                fig_scatter.update_layout(**fig_base())
-                st.plotly_chart(fig_scatter, use_container_width=True)
-                st.caption("💡 Todo a la DERECHA = Culpa de Almacén. Todo ARRIBA = Culpa de Transporte.")
-                st.markdown("#### 📋 Detalle Resumen")
-                if 'Transportadora' in df_scat.columns:
-                    resumen_matriz = df_scat.groupby('Transportadora').agg(
-                        Pedidos_Retrasados=('No_Orden', 'count'),
-                        Retraso_Bodega_Prom=('Desvio_Despacho', 'mean'),
-                        Retraso_Ruta_Prom=('Desvio_Entrega', 'mean')
-                    ).reset_index().round(1)
-                    st.dataframe(resumen_matriz, use_container_width=True, hide_index=True)
-            else:
-                st.success("🎉 Ningún pedido con desvío, la matriz operacional está limpia.")
+ 
 
 
     # ── NUEVA SECCIÓN BI: MAPA DE CALOR SEMANAL Y TENDENCIA SEMANAL ──
     st.markdown("---")
     st.markdown("## 📅 Comportamiento Temporal Avanzado (NUEVO BI)")
-    col_heat, col_week = st.columns(2)
-
-    with col_heat:
-        st.markdown("### 🔥 Calor Operacional (Días vs Impacto)")
-        # Heatmap de retrasos agrupando por Día de la Semana
-        if 'Dia_Semana' in df_filtrado.columns and 'Desvio_Entrega' in df_filtrado.columns:
-            df_heat = df_filtrado[df_filtrado['Cumple_NNS'] == 'No cumple'].copy()
-            if len(df_heat) > 0:
-                heatmap_data = df_heat.groupby(['Dia_Semana_Num', 'Dia_Semana']).agg(
-                    Total_Incumplidos=('Cumple_NNS', 'count'),
-                    Valor_en_Riesgo=('Valor_num', 'sum') if 'Valor_num' in df_heat.columns else ('Cumple_NNS', 'count')
-                ).reset_index()
-                
-                # Orden lógico de los días
-                heatmap_data = heatmap_data.sort_values('Dia_Semana_Num')
-                
-                fig_heat = px.density_heatmap(
-                    heatmap_data, 
-                    x='Dia_Semana', y='Total_Incumplidos', z='Valor_en_Riesgo',
-                    histfunc='avg', template=PLOTLY_TEMPLATE,
-                    color_continuous_scale='Reds',
-                    labels={'Total_Incumplidos': 'Volumen de Retrasos', 'Dia_Semana': 'Día Modificado/Vendido', 'Valor_en_Riesgo': 'Dinero / Peso'},
-                    title="Densidad de Riesgo Financiero por Día Operativo"
-                )
-                fig_heat.update_layout(**fig_base())
-                st.plotly_chart(fig_heat, use_container_width=True)
-                st.caption("💡 El color rojo oscuro indica qué día de la semana concentra la mayor pérdida operativa.")
-                st.markdown("#### 📋 Detalle Resumen")
-                st.dataframe(heatmap_data[['Dia_Semana', 'Total_Incumplidos', 'Valor_en_Riesgo']], use_container_width=True, hide_index=True)
-            else:
-                st.success("🎉 No hay incumplimientos para el mapa de calor.")
+    col_week = st.container()
 
     with col_week:
         st.markdown("### 📈 Tendencia Semanal (Reacción Rápida)")
@@ -471,7 +394,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         st.markdown("#### 📋 Detalle Resumen")
         st.dataframe(top_c[['Ciudad', 'Total', 'Cumplen', 'No_Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
 
-    col5, col6 = st.columns(2)
+    col5 = st.container()
     with col5:
         st.markdown("### 🚚 Desempeño por Transportadora")
         analisis_t = processor.get_analisis_transportadora(df_filtrado)
@@ -489,21 +412,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             st.markdown("#### 📋 Detalle Resumen")
             st.dataframe(top_t[['Transportadora', 'Total', 'Cumplen', 'Pct_Cumplimiento', 'Desvio_Prom']], use_container_width=True, hide_index=True)
 
-    with col6:
-        st.markdown("### 🏢 Responsables vs Causales")
-        if 'Area_Incumple' in df_filtrado.columns and 'Causal_Incumplimiento' in df_filtrado.columns:
-            fig5 = px.histogram(
-                df_filtrado, x='Area_Incumple', color='Causal_Incumplimiento',
-                barmode='stack', text_auto=True, template=PLOTLY_TEMPLATE,
-                labels={'Area_Incumple': 'Responsable', 'Causal_Incumplimiento': 'Causal'}
-            )
-            fig5.update_layout(**fig_base(), xaxis_title='Responsable', yaxis_title='Cantidad', showlegend=True, legend=dict(orientation="h", y=-0.2))
-            st.plotly_chart(fig5, use_container_width=True)
-            
-            st.markdown("#### 📋 Detalle Resumen")
-            resumen = df_filtrado.groupby(['Area_Incumple', 'Causal_Incumplimiento']).size().reset_index(name='Cantidad')
-            resumen = resumen.sort_values(by=['Area_Incumple', 'Cantidad'], ascending=[True, False])
-            st.dataframe(resumen, use_container_width=True, hide_index=True)
+ 
 
     st.markdown("### 🎯 Análisis de Causas Raíz (Principio de Pareto)")
     if 'Causal_Incumplimiento' in df_filtrado.columns:

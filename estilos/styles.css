@@ -13,7 +13,8 @@
 /* Tarjetas de KPIs: gradiente, bordes y tipografía */
 [data-testid="stMetric"] {
     background: linear-gradient(135deg, #1e2130, #252840);
-    border: 1px solid #2e3250;
+    border: 1px solid #FF3B00;
+    border-left: 4px solid #00bfff;
     border-radius: 12px;
     padding: 16px 20px;
 }
