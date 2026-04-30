@@ -339,37 +339,6 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
  
 
 
-    # ── NUEVA SECCIÓN BI: MAPA DE CALOR SEMANAL Y TENDENCIA SEMANAL ──
-    st.markdown("---")
-    st.markdown("## 📅 Comportamiento Temporal Avanzado (NUEVO BI)")
-    col_week = st.container()
-
-    with col_week:
-        st.markdown("### 📈 Tendencia Semanal (Reacción Rápida)")
-        # En vez de ver solo un punto al mes, ver semana a semana en el año
-        if 'Semana' in df_filtrado.columns:
-            analisis_s = df_filtrado.groupby(['Semana']).agg(
-                Total=('Cumple_NNS', 'count'),
-                Cumplen=('Cumple_NNS', lambda x: (x == 'Cumple').sum())
-            ).reset_index()
-            analisis_s['Pct_Cumplimiento'] = (analisis_s['Cumplen'] / analisis_s['Total'] * 100).round(1)
-            
-            fig_week = px.area(
-                analisis_s, x='Semana', y='Pct_Cumplimiento',
-                title="Monitoreo de Pulso Semanal",
-                template=PLOTLY_TEMPLATE,
-                labels={'Semana': 'N° Semana del Año', 'Pct_Cumplimiento': '% Exitoso'},
-                color_discrete_sequence=['#00bfff']  # Azul eléctrico
-            )
-            fig_week.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE, annotation_text='Meta 95%')
-            fig_week.update_layout(**fig_base(), yaxis_range=[0, 115])
-            st.plotly_chart(fig_week, use_container_width=True)
-            st.caption("💡 Las métricas semanales te permiten advertir la caída antes de cerrar mes.")
-            st.markdown("#### 📋 Detalle Resumen")
-            st.dataframe(analisis_s[['Semana', 'Total', 'Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
-
-
-
     # El resto de las métricas clásicas
     st.markdown("---")
     st.markdown("## 🏭 Detalles Generales Operativos")
@@ -429,3 +398,36 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             st.plotly_chart(fig_pareto, use_container_width=True)
             st.markdown("#### 📋 Detalle Resumen")
             st.dataframe(causas[['Causal', 'Frecuencia', 'Porcentaje', 'Porcentaje Acum']], use_container_width=True, hide_index=True)
+
+    # ── NUEVA SECCIÓN BI: MAPA DE CALOR SEMANAL Y TENDENCIA SEMANAL ──
+    st.markdown("---")
+    st.markdown("## 📅 Comportamiento Temporal Avanzado (NUEVO BI)")
+    col_week = st.container()
+
+    with col_week:
+        st.markdown("### 📈 Tendencia Semanal (Reacción Rápida)")
+        # En vez de ver solo un punto al mes, ver semana a semana en el año
+        if 'Semana' in df_filtrado.columns:
+            analisis_s = df_filtrado.groupby(['Semana']).agg(
+                Total=('Cumple_NNS', 'count'),
+                Cumplen=('Cumple_NNS', lambda x: (x == 'Cumple').sum())
+            ).reset_index()
+            analisis_s['Pct_Cumplimiento'] = (analisis_s['Cumplen'] / analisis_s['Total'] * 100).round(1)
+            
+            fig_week = px.area(
+                analisis_s, x='Semana', y='Pct_Cumplimiento',
+                title="Monitoreo de Pulso Semanal",
+                template=PLOTLY_TEMPLATE,
+                labels={'Semana': 'N° Semana del Año', 'Pct_Cumplimiento': '% Exitoso'},
+                color_discrete_sequence=['#00bfff']  # Azul eléctrico
+            )
+            fig_week.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE, annotation_text='Meta 95%')
+            fig_week.update_layout(**fig_base(), yaxis_range=[0, 115])
+            st.plotly_chart(fig_week, use_container_width=True)
+            st.caption("💡 Las métricas semanales te permiten advertir la caída antes de cerrar mes.")
+            st.markdown("#### 📋 Detalle Resumen")
+            st.dataframe(analisis_s[['Semana', 'Total', 'Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
+
+
+
+ 
