@@ -65,3 +65,10 @@
 2026-04-13 12:17:56,842 - INFO - Fila de encabezado detectada: 3
 2026-04-13 12:17:56,927 - INFO - DataFrame cargado: 186 filas, 26 columnas
 2026-04-13 12:17:58,723 - INFO - Procesamiento completado: 166 registros válidos
+2026-04-13 12:20:21,728 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-13 12:20:25,103 - INFO - 🚀 Aplicación TECU Dashboard iniciada
+2026-04-13 12:20:25,187 - INFO - Iniciando carga de archivo: Seguimiento gestion despachos TECU 2026 Indicadores.xlsx
+2026-04-13 12:20:25,237 - INFO - Hoja detectada: Base Ventas
+2026-04-13 12:20:25,291 - INFO - Fila de encabezado detectada: 3
+2026-04-13 12:20:25,374 - INFO - DataFrame cargado: 186 filas, 26 columnas
+2026-04-13 12:20:25,395 - INFO - Procesamiento completado: 166 registros válidos
