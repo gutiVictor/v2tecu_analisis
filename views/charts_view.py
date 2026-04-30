@@ -157,7 +157,7 @@ def fig_base() -> Dict:
         'template': PLOTLY_TEMPLATE,           # Tema oscuro de Plotly
         'paper_bgcolor': 'rgba(0,0,0,0)',      # Fondo transparente
         'plot_bgcolor': 'rgba(0,0,0,0)',       # Área de gráfico transparente
-        'font': {'color': '#e8ecf4', 'family': 'Inter, sans-serif'},  # Tipografía
+        'font': {'color': '#e8ecf4', 'family': 'Funnel Display, sans-serif'},  # Tipografía
         'margin': {'l': 20, 'r': 20, 't': 40, 'b': 40},  # Márgenes compactos
     }
 
@@ -326,7 +326,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                         'Desvio_Prom': True,
                         'Pct_Incumplimiento': True
                     },
-                    color_continuous_scale=['#22c55e', '#f59e0b', '#ef4444'],
+                    color_continuous_scale=['#00bfff', '#FF3B00', '#FF0C00'],
                     center=dict(lat=4.5709, lon=-74.2973), zoom=4.5,
                     mapbox_style="carto-darkmatter",
                     template=PLOTLY_TEMPLATE,
@@ -369,8 +369,8 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                     title="Aislamiento del Origen de la Culpa",
                     labels={'Desvio_Despacho': 'Días de Retraso BODEGA (X)', 'Desvio_Entrega': 'Días de Retraso RUTA (Y)'}
                 )
-                fig_scatter.add_hline(y=0, line_dash='dash', line_color='#ef4444', annotation_text='Retraso de Transporte')
-                fig_scatter.add_vline(x=0, line_dash='dash', line_color='#f59e0b', annotation_text='Retraso de Bodega')
+                fig_scatter.add_hline(y=0, line_dash='dash', line_color='#FF0C00', annotation_text='Retraso de Transporte')
+                fig_scatter.add_vline(x=0, line_dash='dash', line_color='#FF3B00', annotation_text='Retraso de Bodega')
                 fig_scatter.update_layout(**fig_base())
                 st.plotly_chart(fig_scatter, use_container_width=True)
                 st.caption("💡 Todo a la DERECHA = Culpa de Almacén. Todo ARRIBA = Culpa de Transporte.")
@@ -436,7 +436,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                 title="Monitoreo de Pulso Semanal",
                 template=PLOTLY_TEMPLATE,
                 labels={'Semana': 'N° Semana del Año', 'Pct_Cumplimiento': '% Exitoso'},
-                color_discrete_sequence=['#3b82f6']  # Azul eléctrico
+                color_discrete_sequence=['#00bfff']  # Azul eléctrico
             )
             fig_week.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE, annotation_text='Meta 95%')
             fig_week.update_layout(**fig_base(), yaxis_range=[0, 115])
@@ -458,7 +458,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         fig3 = px.bar(
             top_c, x='Ciudad', y='Pct_Cumplimiento',
             color='Pct_Cumplimiento',
-            color_continuous_scale=['#ef4444', '#f59e0b', '#22c55e'],
+            color_continuous_scale=['#FF0C00', '#FF3B00', '#00bfff'],
             text='Pct_Cumplimiento',
             custom_data=['Ciudad', 'Total'],
             template=PLOTLY_TEMPLATE,
@@ -479,7 +479,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
             top_t = analisis_t.head(8).copy()
             fig4 = px.bar(
                 top_t, x='Transportadora', y='Pct_Cumplimiento',
-                color='Desvio_Prom', color_continuous_scale=['#22c55e', '#f59e0b', '#ef4444'],
+                color='Desvio_Prom', color_continuous_scale=['#00bfff', '#FF3B00', '#FF0C00'],
                 text='Pct_Cumplimiento', template=PLOTLY_TEMPLATE,
             )
             fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')

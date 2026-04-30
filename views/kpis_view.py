@@ -99,7 +99,7 @@ def mostrar_kpis(ind_global: Dict, ind_filtrado: Dict, etiqueta_filtro: str = "S
     # Calcular diferencia de cumplimiento para mostrar variación vs global
     delta_pct = round(ind_filtrado.get('pct_cumplimiento', 0) - ind_global.get('pct_cumplimiento', 0), 1)
     delta_str = f"({'+' if delta_pct >= 0 else ''}{delta_pct}% vs global)"
-    color_delta = "#22c55e" if delta_pct >= 0 else "#ef4444"  # Verde si mejora, rojo si empeora
+    color_delta = "#00bfff" if delta_pct >= 0 else "#FF0C00"  # Azul si mejora, rojo si empeora
 
     st.markdown(
         f"<p style='margin:0 0 6px 0; color:#8b9dc3; font-size:0.78rem; "

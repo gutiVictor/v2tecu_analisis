@@ -22,7 +22,7 @@ def color_tipo(tipo: str) -> str:
         'success': COLOR_CUMPLE,
         'warning': COLOR_PTE,
         'error': COLOR_NO_CUMPLE,
-        'info': '#38bdf8',
+        'info': '#00bfff',
     }.get(tipo, COLOR_PRIMARY)  # Fallback al color primario si no coincide
 
 

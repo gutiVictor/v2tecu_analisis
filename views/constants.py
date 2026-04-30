@@ -1,10 +1,10 @@
 # 🎨 CONSTANTES DE CONFIGURACIÓN VISUAL Y DE NEGOCIO
 
 # Colores semánticos para estados de cumplimiento (accesibles y consistentes)
-COLOR_CUMPLE = '#22c55e'      # Verde: pedido cumplido dentro de SLA
-COLOR_NO_CUMPLE = '#ef4444'   # Rojo: pedido fuera de SLA
-COLOR_PTE = '#f59e0b'         # Ámbar: pedido pendiente (PTE)
-COLOR_PRIMARY = '#6366f1'     # Índigo: color principal de la marca
+COLOR_CUMPLE = '#00bfff'      # Azul claro: pedido cumplido dentro de SLA
+COLOR_NO_CUMPLE = '#FF0C00'   # Rojo fuerte: pedido fuera de SLA
+COLOR_PTE = '#FF3B00'         # Naranja/rojo: pedido pendiente (PTE)
+COLOR_PRIMARY = '#00bfff'     # Color principal de la marca
 
 # Plantilla de Plotly para modo oscuro (coherente con el diseño)
 PLOTLY_TEMPLATE = 'plotly_dark'

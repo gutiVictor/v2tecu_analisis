@@ -1,5 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Funnel+Display:wght@400;700&display=swap');
+
+/* Aplicar la tipografía globalmente */
+* {
+    font-family: 'Funnel Display', sans-serif !important;
+}
+
 /* Fondo general de la aplicación */
-.stApp { background-color: #0f1117; }
+.stApp {
+    background-color: #0f1117;
+}
 
 /* Tarjetas de KPIs: gradiente, bordes y tipografía */
 [data-testid="stMetric"] {
@@ -8,12 +17,14 @@
     border-radius: 12px;
     padding: 16px 20px;
 }
-[data-testid="stMetric"] > div:first-child {
+
+[data-testid="stMetric"]>div:first-child {
     font-size: 0.78rem;
     color: #8b9dc3;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
+
 [data-testid="stMetricValue"] {
     font-size: 2rem !important;
     font-weight: 700;
@@ -32,29 +43,62 @@
     background: linear-gradient(180deg, #111827, #1a2035);
     border-right: 1px solid #2e3250;
 }
-[data-testid="stSidebar"] h1, 
+
+[data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
-[data-testid="stSidebar"] h3 { color: #a5b4fc; }
+[data-testid="stSidebar"] h3 {
+    color: #FF3B00;
+}
 
 /* Títulos principales de la app */
-h1 { color: #FF3900 !important; }
-h2, h3 { color: #a5b4fc !important; }
+h1 {
+    color: #FF0C00 !important;
+}
+
+h2 {
+    color: #FF3B00 !important;
+}
+
+h3 {
+    color: #FF3B00 !important;
+}
 
 /* Líneas divisorias horizontales */
-hr { border-color: #2e3250; }
+hr {
+    border-color: #2e3250;
+}
 
 /* Tarjetas de recomendaciones con borde izquierdo de color */
 .rec-card {
     background: #1a2035;
-    border-left: 4px solid #6366f1;
+    border-left: 4px solid #00bfff;
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 12px;
 }
-.rec-success { border-left-color: #22c55e; }  /* Verde: éxito */
-.rec-warning { border-left-color: #f59e0b; }  /* Ámbar: advertencia */
-.rec-error   { border-left-color: #ef4444; }  /* Rojo: error */
-.rec-info    { border-left-color: #38bdf8; }  /* Azul: información */
+
+.rec-success {
+    border-left-color: #00bfff;
+}
+
+/* Azul: éxito */
+.rec-warning {
+    border-left-color: #FF3B00;
+}
+
+/* Naranja/Rojo: advertencia/PTE */
+.rec-error {
+    border-left-color: #FF0C00;
+}
+
+/* Rojo: error */
+.rec-info {
+    border-left-color: #00bfff;
+}
+
+/* Azul: información */
 
 /* Encabezados de tablas de datos */
-.dataframe thead th { background: #252840 !important; }
+.dataframe thead th {
+    background: #252840 !important;
+}
