@@ -294,21 +294,21 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                     Desvio_Prom=('Desvio_Entrega', 'mean')
                 ).reset_index()
 
-                map_agg['Pct_Incumplimiento'] = (
+                map_agg['%_Incumplimiento'] = (
                     map_agg['Incumplidos'] / map_agg['Pedidos'] * 100
                 ).round(1)
                 map_agg['Desvio_Prom'] = map_agg['Desvio_Prom'].round(1)
 
                 fig_geo = px.scatter_mapbox(
                     map_agg, lat='lat', lon='lon',
-                    size='Pedidos', color='Pct_Incumplimiento',
+                    size='Pedidos', color='%_Incumplimiento',
                     hover_name='Ciudad',
                     hover_data={
                         'lat': False, 'lon': False,
                         'Pedidos': True,
                         'Incumplidos': True,
                         'Desvio_Prom': True,
-                        'Pct_Incumplimiento': True
+                        '%_Incumplimiento': True
                     },
                     color_continuous_scale=['#00bfff', '#FF3B00', '#FF0C00'],
                     center=dict(lat=4.5709, lon=-74.2973), zoom=4.5,
@@ -325,7 +325,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
                     f"El tamaño del círculo indica el volumen de pedidos."
                 )
                 st.markdown("#### 📋 Detalle Resumen")
-                df_resumen_geo = map_agg[['Ciudad', 'Pedidos', 'Incumplidos', 'Pct_Incumplimiento', 'Desvio_Prom']].sort_values('Pedidos', ascending=False)
+                df_resumen_geo = map_agg[['Ciudad', 'Pedidos', 'Incumplidos', '%_Incumplimiento', 'Desvio_Prom']].sort_values('Pedidos', ascending=False)
                 st.dataframe(df_resumen_geo.head(15), use_container_width=True, hide_index=True)
                 if sin_coord:
                     st.warning(
