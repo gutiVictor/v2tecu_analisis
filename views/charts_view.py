@@ -363,23 +363,23 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
         st.markdown("#### 📋 Detalle Resumen")
         st.dataframe(top_c[['Ciudad', 'Total', 'Cumplen', 'No_Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
 
-    col5 = st.container()
-    with col5:
-        st.markdown("### 🚚 Desempeño por Transportadora")
-        analisis_t = processor.get_analisis_transportadora(df_filtrado)
-        if analisis_t is not None and len(analisis_t) > 0:
-            top_t = analisis_t.head(8).copy()
-            fig4 = px.bar(
-                top_t, x='Transportadora', y='Pct_Cumplimiento',
-                color='Desvio_Prom', color_continuous_scale=['#00bfff', '#FF3B00', '#FF0C00'],
-                text='Pct_Cumplimiento', template=PLOTLY_TEMPLATE,
-            )
-            fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
-            fig4.update_layout(**fig_base(), yaxis_title='% Cumplimiento', yaxis_range=[0, 115])
-            fig4.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE)
-            st.plotly_chart(fig4, use_container_width=True)
-            st.markdown("#### 📋 Detalle Resumen")
-            st.dataframe(top_t[['Transportadora', 'Total', 'Cumplen', 'Pct_Cumplimiento', 'Desvio_Prom']], use_container_width=True, hide_index=True)
+    # col5 = st.container()
+    # with col5:
+    #     st.markdown("### 🚚 Desempeño por Transportadora")
+    #     analisis_t = processor.get_analisis_transportadora(df_filtrado)
+    #     if analisis_t is not None and len(analisis_t) > 0:
+    #         top_t = analisis_t.head(8).copy()
+    #         fig4 = px.bar(
+    #             top_t, x='Transportadora', y='Pct_Cumplimiento',
+    #             color='Desvio_Prom', color_continuous_scale=['#00bfff', '#FF3B00', '#FF0C00'],
+    #             text='Pct_Cumplimiento', template=PLOTLY_TEMPLATE,
+    #         )
+    #         fig4.update_traces(texttemplate='%{text:.1f}%', textposition='outside')
+    #         fig4.update_layout(**fig_base(), yaxis_title='% Cumplimiento', yaxis_range=[0, 115])
+    #         fig4.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE)
+    #         st.plotly_chart(fig4, use_container_width=True)
+    #         st.markdown("#### 📋 Detalle Resumen")
+    #         st.dataframe(top_t[['Transportadora', 'Total', 'Cumplen', 'Pct_Cumplimiento', 'Desvio_Prom']], use_container_width=True, hide_index=True)
 
  
 
