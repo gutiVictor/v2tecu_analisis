@@ -406,27 +406,52 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
 
     with col_week:
         st.markdown("### 📈 Tendencia Semanal (Reacción Rápida)")
-        # En vez de ver solo un punto al mes, ver semana a semana en el año
         if 'Semana' in df_filtrado.columns:
-            analisis_s = df_filtrado.groupby(['Semana']).agg(
-                Total=('Cumple_NNS', 'count'),
+            # Agrupar asegurando el orden si existe Semana_Sort
+            cols_grupo = ['Semana_Sort', 'Semana'] if 'Semana_Sort' in df_filtrado.columns else ['Semana']
+            analisis_s = df_filtrado.groupby(cols_grupo).agg(
+                Total_Ingresados=('No_Orden', 'count'),
                 Cumplen=('Cumple_NNS', lambda x: (x == 'Cumple').sum())
             ).reset_index()
-            analisis_s['Pct_Cumplimiento'] = (analisis_s['Cumplen'] / analisis_s['Total'] * 100).round(1)
+            if 'Semana_Sort' in df_filtrado.columns:
+                analisis_s = analisis_s.sort_values('Semana_Sort')
+            else:
+                analisis_s = analisis_s.sort_values('Semana')
+                
+            analisis_s['Pct_Cumplimiento'] = (analisis_s['Cumplen'] / analisis_s['Total_Ingresados'] * 100).round(1).fillna(0)
             
-            fig_week = px.area(
-                analisis_s, x='Semana', y='Pct_Cumplimiento',
-                title="Monitoreo de Pulso Semanal",
-                template=PLOTLY_TEMPLATE,
-                labels={'Semana': 'N° Semana del Año', 'Pct_Cumplimiento': '% Exitoso'},
-                color_discrete_sequence=['#00bfff']  # Azul eléctrico
+            fig_week = go.Figure()
+            # Volumen de pedidos (Barras)
+            fig_week.add_trace(
+                go.Bar(
+                    x=analisis_s['Semana'], y=analisis_s['Total_Ingresados'],
+                    name='Pedidos Ingresados', marker_color='rgba(130, 130, 130, 0.4)',
+                    text=analisis_s['Total_Ingresados'], textposition='auto', yaxis='y'
+                )
             )
-            fig_week.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE, annotation_text='Meta 95%')
-            fig_week.update_layout(**fig_base(), yaxis_range=[0, 115])
+            # % Cumplimiento (Línea)
+            fig_week.add_trace(
+                go.Scatter(
+                    x=analisis_s['Semana'], y=analisis_s['Pct_Cumplimiento'],
+                    name='% Cumplimiento', mode='lines+markers+text',
+                    text=analisis_s['Pct_Cumplimiento'].apply(lambda x: f"{x}%"),
+                    textposition='top center', line=dict(color='#00bfff', width=3),
+                    fill='tozeroy', fillcolor='rgba(0, 191, 255, 0.1)', yaxis='y2'
+                )
+            )
+            
+            fig_week.update_layout(
+                **fig_base(), title="Ingreso de Pedidos vs % Cumplimiento Semanal",
+                hovermode="x unified", legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                yaxis=dict(title='Total Ingresados', side='left', showgrid=False),
+                yaxis2=dict(title='% Cumplimiento', side='right', overlaying='y', range=[0, 115], showgrid=True)
+            )
+            fig_week.add_hline(y=95, line_dash='dash', line_color=COLOR_PTE, annotation_text='Meta 95%', yref='y2')
+            
             st.plotly_chart(fig_week, use_container_width=True)
-            st.caption("💡 Las métricas semanales te permiten advertir la caída antes de cerrar mes.")
+            st.caption("💡 Las barras indican la cantidad de pedidos que ingresaron en la semana. La línea indica qué porcentaje de ellos cumplieron la meta NNS.")
             st.markdown("#### 📋 Detalle Resumen")
-            st.dataframe(analisis_s[['Semana', 'Total', 'Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
+            st.dataframe(analisis_s[['Semana', 'Total_Ingresados', 'Cumplen', 'Pct_Cumplimiento']], use_container_width=True, hide_index=True)
 
 
 

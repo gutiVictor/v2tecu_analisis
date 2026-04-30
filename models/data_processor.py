@@ -101,8 +101,9 @@ class DataProcessor:
                 
         # Columnas extra para Análisis BI
         if 'Fecha' in df.columns:
-            # Semana del año para tendencia semanal
-            df['Semana'] = df['Fecha'].dt.isocalendar().week
+            # Semana del mes en lugar del año (Semana 1 a 5)
+            df['Semana_Sort'] = ((df['Fecha'].dt.day - 1) // 7) + 1
+            df['Semana'] = "Semana " + df['Semana_Sort'].astype(str)
             # Día de la semana (0=Lunes, 6=Domingo)
             df['Dia_Semana_Num'] = df['Fecha'].dt.weekday
             dias_map = {0: 'Lunes', 1: 'Martes', 2: 'Miércoles', 3: 'Jueves', 4: 'Viernes', 5: 'Sábado', 6: 'Domingo'}
