@@ -251,7 +251,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
 
     # ── NUEVA SECCIÓN BI: MATRIZ DE CUADRANTES DE TIEMPO Y MAPA GEOGRÁFICO ──
     st.markdown("---")
-    st.markdown("## 🗺️ Análisis Geográfico y Tiempos de Operación (NUEVO BI)")
+    st.markdown("## 🗺️ Análisis Geográfico y Tiempos de Operación ")
     col_map = st.container()
 
     with col_map:
@@ -343,7 +343,7 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
     st.markdown("---")
     st.markdown("## 🏭 Detalles Generales Operativos")
 
-    st.markdown("### 📍 Cumplimiento por Ciudad (Top 12)")
+    st.markdown("### 📍 Cumplimiento por Ciudad ")
     analisis_c = processor.get_analisis_ciudad(df_filtrado)
     if analisis_c is not None and len(analisis_c) > 0:
         top_c = analisis_c.head(12).copy()
@@ -401,11 +401,11 @@ def mostrar_graficos(processor, df_filtrado: pd.DataFrame, debug_mode: bool = Fa
 
     # ── NUEVA SECCIÓN BI: MAPA DE CALOR SEMANAL Y TENDENCIA SEMANAL ──
     st.markdown("---")
-    st.markdown("## 📅 Comportamiento Temporal Avanzado (NUEVO BI)")
+    st.markdown("## 📅 Comportamiento Temporal Avanzado ")
     col_week = st.container()
 
     with col_week:
-        st.markdown("### 📈 Tendencia Semanal (Reacción Rápida)")
+        st.markdown("### 📈 Tendencia Semanal")
         if 'Semana' in df_filtrado.columns:
             # Agrupar asegurando el orden si existe Semana_Sort
             cols_grupo = ['Semana_Sort', 'Semana'] if 'Semana_Sort' in df_filtrado.columns else ['Semana']
